@@ -10,39 +10,39 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="526.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.initialScreenController">
+<AnchorPane prefHeight="526.0" prefWidth="898.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.initialScreenController">
    <children>
       <Label layoutX="14.0" layoutY="14.0" prefHeight="21.0" prefWidth="185.0" text="Select Capturing Method :" />
       <Label layoutX="14.0" layoutY="50.0" prefHeight="21.0" prefWidth="63.0" text="filter:" />
-      <TextField layoutX="230.0" layoutY="45.0" prefHeight="31.0" prefWidth="281.0" />
+      <TextField fx:id="selectionField" layoutX="230.0" layoutY="45.0" prefHeight="31.0" prefWidth="281.0" />
       <Label layoutX="14.0" layoutY="109.0" text="Capturing :" />
-      <HBox layoutY="186.0" prefHeight="129.0" prefWidth="899.0">
+      <HBox layoutY="186.0" prefHeight="129.0" prefWidth="915.0">
          <children>
-            <TableView fx:id="table" onMouseClicked="#onRowSelection" prefHeight="129.0" prefWidth="900.0">
+            <TableView fx:id="table" onMouseClicked="#onRowSelection" prefHeight="129.0" prefWidth="916.0">
               <columns>
                 <TableColumn fx:id="numCol" prefWidth="114.0" text="no" />
                 <TableColumn fx:id="sourceCol" prefWidth="115.0" text="source IP" />
                   <TableColumn fx:id="destCol" prefWidth="141.0" text="destination IP" />
                   <TableColumn fx:id="protocolCol" minWidth="1.0" prefWidth="116.0" text="protocol" />
-                  <TableColumn fx:id="lenCol" prefWidth="130.0" text="length" />
+                  <TableColumn fx:id="lenCol" prefWidth="130.0" text="lenght" />
                   <TableColumn fx:id="infoCol" prefWidth="180.0" text="info" />
-                  <TableColumn fx:id="timeCol" prefWidth="103.0" text="time" />
+                  <TableColumn fx:id="timeCol" prefWidth="112.0" text="time" />
               </columns>
             </TableView>
          </children>
       </HBox>
       <Label layoutX="14.0" layoutY="165.0" text="Main info:" />
       <Label layoutX="14.0" layoutY="322.0" text="Packet Details:" />
-      <HBox layoutX="-1.0" layoutY="343.0" prefHeight="108.0" prefWidth="899.0">
+      <HBox layoutX="-1.0" layoutY="343.0" prefHeight="161.0" prefWidth="915.0">
          <children>
-            <TextArea fx:id="details" prefHeight="108.0" prefWidth="900.0" />
+            <TextArea fx:id="details" prefHeight="161.0" prefWidth="918.0" />
          </children>
       </HBox>
       <ComboBox fx:id="dropdown" layoutX="230.0" layoutY="9.0" onAction="#selectInterfaceAction" prefWidth="150.0" promptText="interface" />
-      <Button layoutX="526.0" layoutY="45.0" mnemonicParsing="false" text="ok" />
+      <Button fx:id="filterButton" layoutX="526.0" layoutY="45.0" mnemonicParsing="false" onAction="#onFilterAction" text="ok" />
       <Button fx:id="start" layoutX="230.0" layoutY="104.0" mnemonicParsing="false" onAction="#CaptureStart" text="start" />
       <Button fx:id="stop" layoutX="300.0" layoutY="104.0" mnemonicParsing="false" onAction="#CaptureStop" text="stop" />
-      <Button fx:id="save" layoutX="730.0" layoutY="135.0" mnemonicParsing="false" onAction="#save" text="save" />
-      <Button fx:id="load" layoutX="803.0" layoutY="135.0" mnemonicParsing="false" onAction="#load" text="load" />
+      <Button fx:id="save" layoutX="778.0" layoutY="150.0" mnemonicParsing="false" onAction="#save" text="Save" />
+      <Button fx:id="load" layoutX="841.0" layoutY="150.0" mnemonicParsing="false" onAction="#load" text="load" />
    </children>
 </AnchorPane>

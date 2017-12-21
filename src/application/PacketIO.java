@@ -32,7 +32,7 @@ public class PacketIO {
 
     public static void saveFile(Pcap pcap){
 try{
-        PcapDumper pdumper =  pcap.dumpOpen("saeed.cap");
+        PcapDumper pdumper =  pcap.dumpOpen("h.cap");
         for (RowObject pd : initialScreenController.packetsList) {
             ByteBuffer bbuf = ByteBuffer.allocateDirect(pd.packet.getCaptureHeader().wirelen());
             byte[] bytes = new byte[pd.packet.size()];

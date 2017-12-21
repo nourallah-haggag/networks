@@ -6,6 +6,8 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.*;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
@@ -19,22 +21,26 @@ import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Http;
 
 public class initialScreenController {
+	public static Ip4 ip = new Ip4();
+	public static Http http = new Http();
 	@FXML
-	private ComboBox dropdown; // selecting interface
+	private ComboBox dropdown ; // selecting interface 
 	public static List<PcapIf> alldevs = new ArrayList<PcapIf>();
-	public static List<String> alldevsString = new ArrayList<String>();
-	public static StringBuilder errbuf = new StringBuilder();
-	public static Pcap pcap;
+	public static  List<String> alldevsString = new ArrayList<String>();
+	public static  StringBuilder errbuf = new StringBuilder();
+	public static Pcap pcap ;
 	static boolean capturing;
 
 	static PcapPacketHandler<String> jpacketHandler;
 
-	public static Ip4 ip = new Ip4();
-	public static Http http = new Http();
-
 	public static ObservableList<RowObject> packetsList = FXCollections.observableArrayList();
+	public static ObservableList<RowObject> filteredList = FXCollections.observableArrayList();
 
-
+	@FXML
+	private Button start;
+	@FXML
+	private Button stop;
+	int counter = 0 ;
 	@FXML
 	TableView<RowObject> table;
 	@FXML
@@ -54,15 +60,20 @@ public class initialScreenController {
 	@FXML
 	TextArea details;
 
+
 	@FXML
-	private Button start;
+			private TextField selectionField ;
 	@FXML
-	private Button stop;
+			private Button filterButton;
 	@FXML
 	private Button save;
 	@FXML
 	private Button load;
-	int counter = 0;
+
+
+	//SortedList<RowObject> sorted ;
+
+
 
 	public void initialize ()
 	{
@@ -75,7 +86,7 @@ public class initialScreenController {
 		infoCol.setCellValueFactory(cellData -> cellData.getValue().infoProperty());
 
 		table.setItems(packetsList);
-
+		
 		int r = Pcap.findAllDevs(alldevs, errbuf);
 		for (PcapIf item: alldevs)
 		{
@@ -87,61 +98,94 @@ public class initialScreenController {
 
 	}
 
-	public void selectInterfaceAction(ActionEvent event) // on select interface action
+	public void onFilterAction(ActionEvent event)
 	{
-		int index = this.dropdown.getSelectionModel().getSelectedIndex();
-
-		System.out.println(alldevs.get(index));
-		PcapIf device = alldevs.get(index);
-
-		int snaplen = 64 * 1024;           // Capture all packets, no trucation  
-		int flags = Pcap.MODE_PROMISCUOUS; // capture all packets
-		int timeout = 10 * 1000;           // 10 seconds in millis
-		pcap =
-				Pcap.openLive(device.getName(), snaplen, flags, timeout, errbuf);
-
-		if (pcap == null) {
-			System.err.printf("Error while opening device for capture: "
-					+ errbuf.toString());
-			return;
+		if (this.selectionField.getText().isEmpty())
+		{
+			filteredList = packetsList; // if the user pressed the filter button and the filter field is empty the old list is returned
 		}
+		else if (!this.selectionField.getText().isEmpty())
+		{
+			//if(RowObject.getProtocol())
+			System.out.println(this.selectionField.getText());
 
+			for(int i=0 ; i<packetsList.size() ; i++)
+			{
+				if( ! (packetsList.get(i).getProtocol().trim().equalsIgnoreCase( this.selectionField.getText().trim())))
+				{
+					System.out.println(packetsList.get(i).getProtocol());
+					packetsList.remove(i);
+					i--;
+					System.out.println(i);
+				}
+
+			}
+
+		}
 
 	}
 
-	public void CaptureStart(ActionEvent event) {
+
+	public void onRowSelection(){
+		RowObject selectedPacketDetails = table.getSelectionModel().getSelectedItem();
+		String text = selectedPacketDetails.packet.toString();
+//        String text = "Package Numer: " + selectedPacketDetails.numProperty().get() + "\nDate: " + selectedPacketDetails.dateProperty().get() + "\nSource IP: " + selectedPacketDetails.sourceIPProperty().get() + "\nDestination IP: " + selectedPacketDetails.destIPProperty().get() + "\nProtocol: " + selectedPacketDetails.protocolProperty().get() + "\nPackage Length: " + selectedPacketDetails.origLenProperty().get();
+		details.setText(text);
+		System.out.println(text);
+	}
+
+
+
+	public  void selectInterfaceAction( ActionEvent event) // on select interface action 
+	{
+		int index=  this.dropdown.getSelectionModel().getSelectedIndex();
+		
+		System.out.println(alldevs.get(index));
+		PcapIf device = alldevs.get(index);
+	
+		int snaplen = 64 * 1024;           // Capture all packets, no trucation  
+        int flags = Pcap.MODE_PROMISCUOUS; // capture all packets  
+        int timeout = 10 * 1000;           // 10 seconds in millis  
+         pcap =  
+            Pcap.openLive(device.getName(), snaplen, flags, timeout, errbuf);  
+  
+        if (pcap == null) {  
+            System.err.printf("Error while opening device for capture: "  
+                + errbuf.toString());  
+            return;  
+        }
+
+		
+	}
+	public void CaptureStart(ActionEvent event)
+	{
 		CaptureThread captureThread = new CaptureThread();
 		capturing = true;
 
 		jpacketHandler = new PcapPacketHandler<String>() {
 
 
+
 			@Override
 			public void nextPacket(PcapPacket packet, String user) {
 				// TODO Auto-generated method stub
-				System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s\n",
-						new Date(packet.getCaptureHeader().timestampInMillis()),
-						packet.getCaptureHeader().caplen(),  // Length actually captured
-						packet.getCaptureHeader().wirelen(), // Original length
-						user                                 // User supplied object
-				);
+				 System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s\n",
+		                    new Date(packet.getCaptureHeader().timestampInMillis()),
+		                    packet.getCaptureHeader().caplen(),  // Length actually captured
+		                    packet.getCaptureHeader().wirelen(), // Original length
+		                    user                                 // User supplied object
+		                    );
+
 				bindPacket(packet);
-
-
 			}
-		};
 
-		captureThread.start();
+        };
+
+        captureThread.start();
 
 
 		counter++;
 	}
-
-	public void CaptureStop(ActionEvent event) {
-		capturing = false;
-
-	}
-
 	public static void bindPacket(PcapPacket packet) {
 
 		if (packet.hasHeader(http)) {
@@ -155,7 +199,8 @@ public class initialScreenController {
 
 			RowObject pd = new RowObject(date, sourceIP, destIP, origLen, info, protocol, packet);
 			initialScreenController.packetsList.add(pd);
-		} else if (packet.hasHeader(ip)) {
+		}
+		else if(packet.hasHeader(ip)) {
 			String date = String.valueOf(packet.getCaptureHeader().timestampInMillis());
 			String sourceIP = FormatUtils.ip(ip.source());
 			String destIP = FormatUtils.ip(ip.destination());
@@ -169,12 +214,15 @@ public class initialScreenController {
 
 
 	}
-	public void onRowSelection(){
-		RowObject selectedPacketDetails = table.getSelectionModel().getSelectedItem();
-		String text = selectedPacketDetails.packet.toString();
-//        String text = "Package Numer: " + selectedPacketDetails.numProperty().get() + "\nDate: " + selectedPacketDetails.dateProperty().get() + "\nSource IP: " + selectedPacketDetails.sourceIPProperty().get() + "\nDestination IP: " + selectedPacketDetails.destIPProperty().get() + "\nProtocol: " + selectedPacketDetails.protocolProperty().get() + "\nPackage Length: " + selectedPacketDetails.origLenProperty().get();
-		details.setText(text);
-		System.out.println(text);
+	public void CaptureStop(ActionEvent event)
+	{
+		capturing = false;
+
+	}
+
+	public void filter(){
+		//sorted.comparatorProperty().bind(table.comparatorProperty());
+		table.setItems(filteredList);
 	}
 
 	public void save(ActionEvent event){
@@ -183,11 +231,17 @@ public class initialScreenController {
 
 	public void load ( ActionEvent event)
 	{
-		PacketIO fileLoad = new PacketIO("saeed.cap");
+		PacketIO fileLoad = new PacketIO("haggag.cap");
 		try {
 			fileLoad.loadFile();
 		} catch (Exception exceptionReadingPcapFiles) {
 			exceptionReadingPcapFiles.printStackTrace();
 		}
 	}
+
+
+
+
+	
+
 }
