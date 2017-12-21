@@ -42,5 +42,7 @@
       <Button layoutX="526.0" layoutY="45.0" mnemonicParsing="false" text="ok" />
       <Button fx:id="start" layoutX="230.0" layoutY="104.0" mnemonicParsing="false" onAction="#CaptureStart" text="start" />
       <Button fx:id="stop" layoutX="300.0" layoutY="104.0" mnemonicParsing="false" onAction="#CaptureStop" text="stop" />
+      <Button fx:id="save" layoutX="730.0" layoutY="135.0" mnemonicParsing="false" onAction="#save" text="save" />
+      <Button fx:id="load" layoutX="803.0" layoutY="135.0" mnemonicParsing="false" onAction="#load" text="load" />
    </children>
 </AnchorPane>

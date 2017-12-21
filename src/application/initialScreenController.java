@@ -58,6 +58,10 @@ public class initialScreenController {
 	private Button start;
 	@FXML
 	private Button stop;
+	@FXML
+	private Button save;
+	@FXML
+	private Button load;
 	int counter = 0;
 
 	public void initialize ()
@@ -171,5 +175,19 @@ public class initialScreenController {
 //        String text = "Package Numer: " + selectedPacketDetails.numProperty().get() + "\nDate: " + selectedPacketDetails.dateProperty().get() + "\nSource IP: " + selectedPacketDetails.sourceIPProperty().get() + "\nDestination IP: " + selectedPacketDetails.destIPProperty().get() + "\nProtocol: " + selectedPacketDetails.protocolProperty().get() + "\nPackage Length: " + selectedPacketDetails.origLenProperty().get();
 		details.setText(text);
 		System.out.println(text);
+	}
+
+	public void save(ActionEvent event){
+		PacketIO.saveFile(pcap);
+	}
+
+	public void load ( ActionEvent event)
+	{
+		PacketIO fileLoad = new PacketIO("saeed.cap");
+		try {
+			fileLoad.loadFile();
+		} catch (Exception exceptionReadingPcapFiles) {
+			exceptionReadingPcapFiles.printStackTrace();
+		}
 	}
 }
